@@ -1,0 +1,22 @@
+UpdatePilot
+Copyright (C) 2026 Tamer Albayrak
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 of the License only.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+Corresponding UpdatePilot source code:
+https://github.com/Taxperia/UpdatePilot
+Each release includes a source archive for the tagged version.
+
+Electron, Chromium, Node.js, and other third-party components retain
+their respective licenses and copyright notices. Their licenses are
+not replaced by the license for UpdatePilot.

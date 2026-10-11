@@ -1,11 +1,14 @@
 {
   "name": "updatepilot",
   "version": "3.0.0",
-  "description": "Windows uygulamaları için otomatik güncelleme merkezi",
+  "description": "Windows desktop update manager with official publisher sources, WinGet integration, and verified installer downloads.",
   "main": "electron/main.js",
   "private": true,
-  "author": "UpdatePilot",
-  "license": "UNLICENSED",
+  "author": "Tamer Albayrak",
+  "license": "GPL-3.0-only",
+  "repository": { "type": "git", "url": "https://github.com/Taxperia/UpdatePilot.git" },
+  "homepage": "https://github.com/Taxperia/UpdatePilot#readme",
+  "bugs": { "url": "https://github.com/Taxperia/UpdatePilot/issues" },
   "engines": { "node": ">=22" },
   "scripts": {
     "postinstall": "node -e \"require('electron')\"",
@@ -26,6 +29,7 @@
     "productName": "UpdatePilot",
     "directories": { "output": "dist" },
     "files": ["electron/**/*", "src/**/*", "web/**/*", "assets/**/*", "package.json"],
+    "extraFiles": ["LICENSE", "NOTICE", "SECURITY.md"],
     "win": { "target":"portable", "signExecutable":false, "icon":"assets/icon.ico" },
     "portable": { "artifactName": "UpdatePilot-${version}-${arch}.exe" }
   }

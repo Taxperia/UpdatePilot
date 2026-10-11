@@ -1,125 +1,146 @@
-# UpdatePilot 3.0 — Node.js / Electron
+# UpdatePilot
 
-UpdatePilot kurulu Windows uygulamalarını otomatik analiz eder, desteklenen uygulamaların resmi sürüm kaynaklarını kontrol eder ve **Update / Güncelle** düğmesine basıldığında kurulum paketini indirir. Diğer uygulamalarda WinGet kataloğu kullanılır. Arayüz siyah-beyazdır; varsayılan dil İngilizcedir. Almanca, Fransızca ve Türkçe de desteklenir.
+A Windows desktop update manager built with Node.js and Electron. UpdatePilot scans installed applications, checks official publisher sources and the WinGet catalog, and downloads compatible installers for you to run.
 
-## Çalıştırma
+The interface supports **English, German, French, and Turkish**, with English as the default, dark and light themes, and a compact application list.
 
-`UpdatePilot.bat` dosyasına çift tıklayın. Paketlenmiş uygulama varsa doğrudan açılır. Geliştirme sürümü için Node.js 22+ gerekir; Python gerekmez.
+## Download
+
+Download `UpdatePilot-3.0.0-x64.exe` from the [latest release](https://github.com/Taxperia/UpdatePilot/releases/latest) and run it on Windows x64. The portable application includes its runtime; Node.js and Python are not required.
+
+Install **App Installer / WinGet** for catalog matching and catalog downloads. Check availability with:
 
 ```powershell
+winget --version
+```
+
+Releases include a source archive and `SHA256SUMS.txt`. Calculate the executable's checksum with:
+
+```powershell
+Get-FileHash .\UpdatePilot-3.0.0-x64.exe -Algorithm SHA256
+```
+
+Compare the result with `SHA256SUMS.txt`. The executable is not code signed; a checksum checks file integrity, not publisher identity. Downloads require repository access while the repository is private.
+
+## Features
+
+- Scan Windows registry entries in machine and user scopes and match applications using WinGet package identifiers.
+- Prefer supported publishers' official APIs and release repositories, with clearly labeled catalog fallback.
+- Choose the latest Node.js release, latest LTS release, or an update within the installed major version.
+- Download Windows installers appropriate for the application's architecture and installation scope.
+- Schedule update checks, optionally download packages automatically, and receive Windows notifications.
+- Configure startup, system tray behavior, themes, language, and compact view.
+- Track applications through a manually assigned GitHub repository or HTTPS download URL when automatic matching is unavailable.
+
+## How updates work
+
+1. UpdatePilot reads installed application records and matches them against the WinGet catalog.
+2. It checks supported publishers' official sources. Other matched applications use `winget show` for catalog versions.
+3. Select **Update** in an application row or its details to download an installer. Progress and results appear in the interface.
+4. Packages are saved to the `UpdatePilot` subfolder of your Windows Downloads folder. Open that folder and run the installer yourself.
+5. After installation, rescan to refresh the installed version.
+
+**Update downloads a package; installers are never run automatically.** Optional automatic downloads are disabled by default and limited to two concurrent jobs when enabled.
+
+The interface distinguishes official, catalog, GitHub, and manual sources. Catalog data may lag behind a publisher's releases. Older catalog versions are labeled as stale and cannot be downloaded as an update. A failed check is reported as an error rather than marking an application up to date.
+
+## Supported release sources
+
+| Application | Source and behavior |
+| --- | --- |
+| Node.js | Official distribution index; separate latest, LTS, and installed-major channels. Downloads require a matching official SHA-256 checksum. |
+| Cursor and Visual Studio Code | Official update APIs, preserving architecture and user/system installation scope. |
+| Firefox | Mozilla Product Details API, distinguishing release and ESR channels and preserving the installed language. |
+| Chrome | Google VersionHistory API. Google's current Windows MSI is used when the catalog is missing or behind; this is an evergreen installer rather than a version-pinned archive. |
+| Git, GitHub CLI, DBeaver, PowerToys, Tailscale, Notepad++, RustDesk, WinDirStat, Zen Browser | Known publisher GitHub release repositories. |
+| Other matched applications | WinGet catalog versions and downloads. |
+
+User-assigned GitHub repositories take priority. Compatible `.exe`, `.msi`, `.msix`, or `.zip` assets are selected; a GitHub-provided SHA-256 digest is verified when available. WinGet download hash verification remains enabled. Manual URLs without a supplied digest do not provide independent checksum verification.
+
+Applications without a supported source or a WinGet match remain unmatched until a repository or manual package is assigned. Similar repository names are not automatically trusted. Microsoft Store-only packages and macOS/Linux are outside this release's scope.
+
+## Settings
+
+Open **Settings** in the lower-left corner. Changes are saved immediately.
+
+| Section | Options |
+| --- | --- |
+| General | Start with Windows, minimize to tray, confirm exit during downloads, start minimized, and startup page. |
+| Appearance | Dark/light theme and compact list. |
+| Updates | Check at startup, scheduled checks every 15 minutes / 1 hour / 6 hours / 1 day, automatic downloads, and prerelease filtering. |
+| Notifications | Windows notifications, download completion/error preferences, and a test notification. |
+| Language | English, German, French, and Turkish. |
+| Advanced | Include user-scope applications and quit the application. |
+
+Windows startup is disabled by default. Enabling it adds a user-scoped startup entry; disabling it removes that entry. Portable startup uses the original executable path rather than its temporary extraction directory. Windows notification settings may suppress notifications.
+
+**Reset defaults** restores English and the dark theme without deleting tracked applications, downloads, or history. Press **Escape**, click outside the dialog, or select **Done** to close settings.
+
+## Local data and privacy
+
+- Configuration: `%LOCALAPPDATA%\UpdatePilot\config.json`
+- History: `%LOCALAPPDATA%\UpdatePilot\history.jsonl`
+- Packages: your Windows Downloads folder, under `UpdatePilot`
+
+Configuration and history are stored locally. Version checks and downloads make network requests to the catalog, GitHub, and package publishers. GitHub credentials are not sent to the renderer. Local configuration may contain credentials and should not be shared without redaction.
+
+Settings from the previous Python implementation are preserved, including repository mappings, ignored versions, and manual packages. The first Node.js launch creates a `config.json.python-backup` copy of existing settings. Corrupt configuration is not silently overwritten. Historical Python sources remain in `legacy-python/`; the desktop application does not use them.
+
+## Development
+
+Requirements: **Windows**, **Node.js 22+**, and **WinGet** for catalog operations.
+
+```powershell
+git clone https://github.com/Taxperia/UpdatePilot.git
+cd UpdatePilot
 npm.cmd ci
 npm.cmd start
 ```
 
-PowerShell'de proje klasörüne geçerek çalıştırın:
+You can also double-click `UpdatePilot.bat`. It opens a packaged executable when present, otherwise the development application. If the application is already running, launching it again brings the existing window forward.
 
-```powershell
-cd "C:\Users\talba\Desktop\gh\UpdatePilot"
-npm.cmd start
-```
-
-Pencere açıldığında terminalde `UpdatePilot window opened.` mesajı görünür. Windows'ta başlatıcı Electron'u görünür başlatır; uygulama zaten açıksa mevcut pencereyi öne getirir. Küçültülmüş başlatma tercih edilirse tepsi simgesinden açabilirsiniz.
-
-## Ayarlar
-
-Sol alttaki **Settings** düğmesi, sol bölüm menüsü ve anında kaydedilen tercihlerle modal pencere açar. GitHub ayarları ile veri/klasör yönetimi bölümü kaldırılmıştır; sürüm deposu desteği uygulama detayında korunur.
-
-- **General:** Windows ile başlatma, sistem tepsisine küçültme, indirmeler devam ederken çıkış onayı, küçültülmüş başlatma ve açılış sayfası.
-- **Appearance:** Siyah veya beyaz görünüm; renkli gradyan kullanılmaz. Kompakt liste seçeneği.
-- **Updates:** Açılış kontrolü, çalışırken zamanlanmış kontrol (15 dakika / 1 saat / 6 saat / 1 gün), otomatik paket indirme ve ön sürüm filtresi. Otomatik indirme varsayılan olarak kapalıdır; açıldığında en fazla iki paket aynı anda indirilir. Yükleyiciler kendiliğinden çalıştırılmaz.
-- **Notifications:** Windows bildirimleri, indirme tamamlandı/hata tercihleri ve gerçek test bildirimi. Uygulama kimliği ve Windows Başlat menüsü kısayolu kaydedilir; bildirim hataları geçmişe yazılır. Aynı bildirim oturum boyunca tekrarlanmaz. Bildirime tıklama güncelleme listesini veya indirilenleri açar.
-- **Language:** English / Deutsch / Français / Türkçe. Arayüz ve gelecekteki bildirimler anında değişir; tercih kalıcıdır.
-- **Advanced:** Kullanıcı kapsamındaki uygulamaları tarama ve uygulamadan çıkış.
-
-Windows başlangıcı varsayılan olarak kapalıdır. Etkinleştirildiğinde yalnızca bu uygulama için kullanıcı başlangıç kaydı eklenir; kapatıldığında kaldırılır. Taşınabilir EXE kullanıldığında geçici açılım klasörü yerine asıl EXE yolu kaydedilir. Windows'un Rahatsız Etmeyin veya bildirim tercihleri başlıkları gizleyebilir; uygulamadaki test düğmesi Windows gönderim sonucunu gösterir.
-
-**Reset defaults** tercihlerde İngilizce/siyah varsayılanlarına döner; takip edilen uygulamaları, paketleri veya geçmişi silmez. **Escape**, dış alana tıklama veya **Done** modalı kapatır.
-
-Tek başına dağıtılabilen Windows uygulaması:
+Build the portable executable:
 
 ```powershell
 npm.cmd run dist
 ```
 
-Çıktı: `dist/UpdatePilot-3.0.0-x64.exe`. Bu uygulamayı çalıştırmak için Node.js veya Python kurulumu gerekmez. Otomatik Windows katalog kontrolü ve indirmesi için **App Installer / WinGet** gereklidir. `winget --version` ile kontrol edilebilir.
+Output: `dist/UpdatePilot-3.0.0-x64.exe`. The distribution includes the project license and copyright notice alongside the unpacked application.
 
-## Güncelleme akışı
-
-1. Açılışta Windows kayıt defterinin 32/64 bit ve kullanıcı kapsamındaki kurulu uygulama kayıtları okunur.
-2. `winget list --source winget` ile Windows paket kataloğunun doğruladığı uygulama kimlikleri eşleştirilir. WinGet'in keşfettiği ek uygulamalar listeye eklenir.
-3. Açılışta otomatik kontrol açıksa desteklenen uygulamaların resmi sürüm API'leri veya yayıncı GitHub depoları sorgulanır. Resmi kaynak desteği olmayan uygulamalarda `winget show` ile katalog sürümü alınır. **Güncellemeleri Kontrol Et** düğmesi sorguları yeniler.
-4. **Kurulu Programlar → Detay → Güncelle** veya satırın indirme simgesi, belirlenen sürümün paketini indirir. WinGet indirmelerinde SHA-256 doğrulaması açık tutulur. İndirme ilerlemesi ve sonuç arayüzde gösterilir.
-5. Paketler Windows'un İndirilenler klasöründeki `UpdatePilot` altına kaydedilir. İndirilenler klasörünü uygulamadan açıp resmi yükleyiciyi çalıştırabilirsiniz. **Güncelle düğmesi indirme başlatır; sessiz veya izinsiz kurulum yapmaz.** Kurulumdan sonra **Yeniden Tara** yeni kurulu sürümü okur.
-
-GitHub deposu atanmış uygulamalarda kullanıcı seçimi önceliklidir. Windows'a ve işlemci mimarisine uygun `.exe`, `.msi`, `.msix` veya `.zip` paketi seçilir; GitHub SHA-256 özeti sağlıyorsa doğrulanır. Manuel paketlerin doğrudan HTTPS indirme bağlantısı da aynı indirme akışını kullanır.
-
-## Resmi sürüm kaynakları ve sürüm kanalları
-
-- **Node.js:** `nodejs.org/dist/index.json` doğrudan okunur. Tabloda en yeni genel sürüm gösterilir. Detay panelinde **en yeni genel / en yeni LTS / kurulu ana sürüm serisinin güncellemesi** ayrı indirme seçenekleridir. İndirme, seçilen sürümün resmi Windows MSI/ZIP dosyasıdır; `SHASUMS256.txt` ile SHA-256 doğrulaması zorunludur. Büyük sürüm değişikliği açıkça gösterilir.
-- **Cursor ve VS Code:** Yayıncının resmi güncelleme/indirme API'si; kullanıcı/sistem kapsamı ve mimari korunur.
-- **Firefox:** Mozilla Product Details API; normal ve ESR kanalı ayrılır, kurulu dil korunur.
-- **Chrome:** Google VersionHistory API. Katalogda aynı sürüm yoksa Google'ın genel güncel Windows MSI yükleyicisi kullanılır. Bu bağlantı belirli bir sürüme sabitlenmiş arşiv değildir; Google tarafından güncellenir. Sürüm kontrolü için cihazın OS build'i veya kurulu Chrome sürümü Google'a gönderilmez.
-- **Git, GitHub CLI, DBeaver, PowerToys, Tailscale, Notepad++, RustDesk, WinDirStat, Zen Browser:** Doğrulanmış yayıncı GitHub Releases depoları önceliklidir.
-
-Tabloda sürümün altında **Resmi / Katalog / GitHub / Manuel** etiketi bulunur. Sürüm metninin üzerinde bekleyince tam sürüm ve kaynak bilgisi görünür. Detay panelinde kaynak açıkça yazılır.
-
-Katalogdan gelen sonuç resmi sitenin mutlak en yeni sürümü olarak sunulmaz. Eşit sürüm **Katalogda güncel**, kurulu sürümden eski katalog **Katalog eski** olarak gösterilir ve eski paketin indirilmesi engellenir. Resmi API başarısız olursa katalog verisine dönülebilir; başarısızlık ve kullanılan kaynak açıkça belirtilir.
-
-## Kapsam
-
-- Her uygulamanın internette standart bir sürüm API'si yoktur. Resmi kaynak desteği ve WinGet eşleşmesi bulunmayan uygulamalar **Eşleşme yok** olarak gösterilir; bir GitHub deposu veya manuel paket atanabilir. Benzer isimli rastgele depolar otomatik atanmaz.
-- Kurulu sürüm belirlenemiyorsa **Bilinmiyor**, ağ/katalog sorgusu başarısızsa **Hata** gösterilir. Başarısız kontrol uygulamayı güncel olarak işaretlemez.
-- Microsoft Store'a özel paket indirmeleri bu akışın kapsamına dahil değildir. WinGet kaynağındaki desteklenen masaüstü paketleri kullanılır.
-- Mimariye uygun yükleyici bulunmazsa hata gösterilir; yanlış işletim sistemi paketi indirilmez.
-- Otomatik analiz ve güncelleme kaynağı Windows için geliştirilmiştir. macOS/Linux desteği bu sürümün kapsamına dahil değildir.
-
-## Yedek ve mevcut veriler
-
-Düzenlemeden önce alınan orijinal proje ZIP yedeği `backups/` klasöründedir. Python kaynakları `legacy-python/` altında korunur; yeni uygulama bunları kullanmaz.
-
-- Ayarlar: `%LOCALAPPDATA%\UpdatePilot\config.json`
-- Geçmiş: `%LOCALAPPDATA%\UpdatePilot\history.jsonl`
-- Paketler: Windows İndirilenler klasörü → `UpdatePilot`
-
-Eski Python sürümünün ayarları, depo eşleştirmeleri, yoksayılan sürümleri ve manuel paketleri aynı veri biçimiyle okunur. İlk Node.js açılışında mevcut ayar dosyasının `config.json.python-backup` kopyası alınır. Bozuk ayarlar otomatik olarak üzerine yazılmaz.
-
-Ayarlar ve geçmiş yereldedir. Katalog, GitHub ve paket sağlayıcılarına gerekli çevrimiçi sürüm/indirme istekleri yapılır. GitHub tokeni arayüze gönderilmez.
-
-## Geliştirme ve doğrulama
+### Validation
 
 ```powershell
 npm.cmd test
 npm.cmd run diagnose
 npm.cmd run qa -- --smoke
+npm.cmd run qa -- --smoke --smoke-settings
 npm.cmd run qa -- --smoke --smoke-download
 npm.cmd run qa -- --smoke --smoke-node-download
 npm.cmd run qa -- --smoke --smoke-node-download --smoke-node-track=series
-npm.cmd run qa -- --smoke --smoke-settings
 npm.cmd run pack
 node scripts/packaged-smoke.js
 node scripts/packaged-smoke.js --portable
-node scripts/packaged-smoke.js --smoke-settings --native-test
 ```
 
-- Testler sürüm karşılaştırması, otomatik eşleştirme, veri geçişi, hata durumları, mimari seçimi ve dosya doğrulamasını kapsar.
-- `diagnose` gerçek kurulu uygulama/katalog kontrolünü yapar; sonuçları `.qa/diagnose.json` içine yazar.
-- `qa -- --smoke` gerçek Electron penceresini test eder; ekran görüntüsü ve raporu `.qa/` içine kaydeder.
-- `--smoke-download` ayrıca Güncelle düğmesi üzerinden **GitHub CLI** paketini `.qa/downloads` içine indirir. Kurulum yapmaz.
-- `--smoke-node-download`, Node.js sürüm seçeneklerini ve resmi en yeni MSI dosyasının indirilmesini doğrular. `--smoke-node-track=series` kurulu ana sürümün güncelleme düğmesini test eder. Kurulum yapmaz.
-- QA ve tanılama ayrı veri klasörlerini kullanır; normal kullanıcı ayarlarını değiştirmez.
-- `packaged-smoke.js`, `dist/win-unpacked/UpdatePilot.exe` uygulamasını `.qa/packaged` içinde ayrı verilerle test eder.
-- `--portable`, dağıtılan tek EXE dosyasını doğrudan test eder; raporu `.qa/portable/smoke.json` içine yazar.
-- `--smoke-settings`, dört dilin gerçek modal geçişini, temaları, klavye davranışını ve tercih kaydını doğrular. `--native-test` ayrıca UpdatePilot QA adına geçici bir Windows başlangıç kaydı ekleyip kaldırır ve gerçek Windows bildirimi gönderir. Normal kullanıcı ayarları değişmez.
+Tests cover version comparison, source selection, data migration, architecture matching, download integrity, settings, scheduling, and notifications. Diagnostics and UI smoke tests write reports to `.qa/` and use separate configuration directories. Download smoke tests download real packages without installing them. `--smoke-settings --native-test` additionally tests a temporary QA startup entry and a real Windows notification.
 
-## Mimari
+## Architecture
 
-- `electron/main.js`: Electron penceresi, dar kapsamlı IPC işlemleri, bildirimler ve CSV kaydetme.
-- `electron/preload.js`: İzole arayüz köprüsü. Renderer içinde Node.js erişimi kapalıdır; sandbox açıktır.
-- `src/scanner.js`: Salt okunur Windows uygulama taraması.
-- `src/winget.js`: Katalog eşleştirmesi, sürüm sorgusu ve doğrulanmış paket indirme.
-- `src/github.js`, `src/download.js`: GitHub sürümleri, mimari seçimi, HTTPS indirme, ilerleme ve dosya doğrulama.
-- `src/official-sources.js`: Resmi yayıncı API'leri, Node.js sürüm kanalları ve doğrulanmış yayıncı deposu eşleştirmeleri.
-- `src/app-state.js`, `src/storage.js`, `src/versioning.js`: Uygulama işleri, Python verileriyle uyumlu depolama ve sürüm karşılaştırması.
-- `src/preferences.js`, `src/update-scheduler.js`, `src/desktop-services.js`: Tercih doğrulama, zamanlanmış kontroller, Windows başlangıcı, bildirimler ve kısayol kaydı.
-- `web/i18n.js`: Arayüz ve sistem bildirimleri için paylaşılan dört dil sözlüğü.
-- `web/`: Korunan HTML/CSS/JS arayüzü. Yerel HTTP sunucusu gerekmez.
+| Path | Responsibility |
+| --- | --- |
+| `electron/` | Desktop window, restricted IPC, isolated preload bridge, notifications, and UI validation. |
+| `src/scanner.js`, `src/winget.js` | Read-only application discovery, catalog matching, and verified catalog downloads. |
+| `src/official-sources.js`, `src/github.js`, `src/download.js` | Publisher APIs, release channels, asset selection, HTTPS downloads, and checksum verification. |
+| `src/app-state.js`, `src/storage.js`, `src/versioning.js` | Application state, compatible local persistence, and version comparison. |
+| `src/preferences.js`, `src/update-scheduler.js`, `src/desktop-services.js` | Settings, scheduling, Windows startup, and notifications. |
+| `web/` | HTML/CSS/JavaScript interface and shared translations. |
+
+The renderer has Node.js integration disabled, context isolation enabled, and sandboxing enabled. No local HTTP server is needed.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for supported versions, vulnerability reporting, and download verification limits.
+
+## License
+
+Copyright (C) 2026 Tamer Albayrak. UpdatePilot is licensed under the [GNU General Public License v3.0 only](LICENSE), SPDX identifier `GPL-3.0-only`. See [NOTICE](NOTICE) for the project notice. Third-party components retain their own licenses and notices.
