@@ -14,7 +14,7 @@ function release(raw) {
 class GitHub {
   constructor() { this.remaining = null; }
   async request(endpoint, token = '') {
-    const headers = { Accept: 'application/vnd.github+json', 'User-Agent': 'UpdatePilot/3.0', 'X-GitHub-Api-Version': '2022-11-28' };
+    const headers = { Accept: 'application/vnd.github+json', 'User-Agent': 'UpdatePilot/' + require('../package.json').version, 'X-GitHub-Api-Version': '2022-11-28' };
     if (token) headers.Authorization = 'Bearer ' + token;
     const result = await fetch('https://api.github.com' + endpoint, { headers, signal: AbortSignal.timeout(30000) });
     if (result.headers.has('x-ratelimit-remaining')) this.remaining = Number(result.headers.get('x-ratelimit-remaining'));

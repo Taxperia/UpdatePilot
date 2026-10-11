@@ -38,7 +38,7 @@ class OfficialSources {
     return null;
   }
   async response(url) {
-    const result = await this.fetch(httpsUrl(url), { headers: { 'User-Agent': 'UpdatePilot/3.0' }, signal: AbortSignal.timeout(30000) });
+    const result = await this.fetch(httpsUrl(url), { headers: { 'User-Agent': 'UpdatePilot/' + require('../package.json').version }, signal: AbortSignal.timeout(30000) });
     if (!result.ok) throw new Error('Resmi sürüm isteği başarısız: HTTP ' + result.status);
     return result;
   }

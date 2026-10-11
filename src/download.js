@@ -26,7 +26,7 @@ async function downloadFile(asset, directory, onProgress = () => {}) {
     refreshTimeout();
     let result;
     for (let redirects = 0; redirects <= 10; redirects++) {
-      result = await fetch(url, { redirect: 'manual', headers: { 'User-Agent': 'UpdatePilot/3.0', 'Accept-Encoding': 'identity' }, signal: controller.signal });
+      result = await fetch(url, { redirect: 'manual', headers: { 'User-Agent': 'UpdatePilot/' + require('../package.json').version, 'Accept-Encoding': 'identity' }, signal: controller.signal });
       if (![301, 302, 303, 307, 308].includes(result.status)) break;
       const location = result.headers.get('location');
       await result.body?.cancel();

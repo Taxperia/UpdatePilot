@@ -7,7 +7,7 @@
 - 48 Node.js işlev testi başarılı. Resmi kaynaklar, sürüm kanalları, tercih kaydı, otomatik kontrol, iki eşzamanlı otomatik indirme, bildirim hataları ve Windows başlangıç yolunun seçimi kapsanır.
 - npm bağımlılık denetimi: 0 bilinen güvenlik açığı.
 - Gerçek Electron arayüz testi ve paketlenmiş EXE testi başarılı; renderer konsol hatası yok. Renderer içinde `require` erişimi kapalı.
-- Dağıtılan `dist/UpdatePilot-3.0.0-x64.exe` dosyası doğrudan açılarak da test edildi; sonuç başarılı.
+- Geliştirme sırasında hazırlanan taşınabilir EXE doğrudan açılarak da test edildi; sonuç başarılı. İlk GitHub sürümü `v1.0.0` olarak numaralandırılır.
 - Başlatıcıdaki Windows gizli pencere bayrağı kaldırıldı. `npm.cmd start` ile görünür `UpdatePilot — Güncelleme Merkezi` penceresi ve ikinci çalıştırmada aynı pencerenin öne gelmesi doğrulandı.
 - İngilizce varsayılan; Almanca, Fransızca ve Türkçe gerçek ayar kontrollerinden değiştirilerek ve diske kaydedilerek doğrulandı. Paylaşılan sözlükte 221 anahtarın dört dil karşılığı bulunur.
 - Ayarlar modal olarak açıldı; alttaki sayfa korunuyor. Altı ayar bölümü, Escape ile kapanma, klavye odağı, anında kayıt ve siyah/beyaz tema geçişi test edildi. GitHub/veri/klasör bölümleri modalda bulunmuyor.

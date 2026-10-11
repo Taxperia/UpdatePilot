@@ -1,6 +1,6 @@
 {
   "name": "updatepilot",
-  "version": "3.0.0",
+  "version": "1.0.0",
   "description": "Windows desktop update manager with official publisher sources, WinGet integration, and verified installer downloads.",
   "main": "electron/main.js",
   "private": true,

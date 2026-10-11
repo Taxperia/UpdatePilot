@@ -6,7 +6,7 @@ The interface supports **English, German, French, and Turkish**, with English as
 
 ## Download
 
-Download `UpdatePilot-3.0.0-x64.exe` from the [latest release](https://github.com/Taxperia/UpdatePilot/releases/latest) and run it on Windows x64. The portable application includes its runtime; Node.js and Python are not required.
+Download `UpdatePilot-1.0.0-x64.exe` from the [latest release](https://github.com/Taxperia/UpdatePilot/releases/latest) and run it on Windows x64. The portable application includes its runtime; Node.js and Python are not required.
 
 Install **App Installer / WinGet** for catalog matching and catalog downloads. Check availability with:
 
@@ -17,7 +17,7 @@ winget --version
 Releases include a source archive and `SHA256SUMS.txt`. Calculate the executable's checksum with:
 
 ```powershell
-Get-FileHash .\UpdatePilot-3.0.0-x64.exe -Algorithm SHA256
+Get-FileHash .\UpdatePilot-1.0.0-x64.exe -Algorithm SHA256
 ```
 
 Compare the result with `SHA256SUMS.txt`. The executable is not code signed; a checksum checks file integrity, not publisher identity. Downloads require repository access while the repository is private.
@@ -105,7 +105,7 @@ Build the portable executable:
 npm.cmd run dist
 ```
 
-Output: `dist/UpdatePilot-3.0.0-x64.exe`. The distribution includes the project license and copyright notice alongside the unpacked application.
+Output: `dist/UpdatePilot-1.0.0-x64.exe`. The distribution includes the project license and copyright notice alongside the unpacked application.
 
 ### Validation
 

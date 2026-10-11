@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Security fixes target the latest stable release in the 3.x series. Earlier major versions and the historical Python implementation in `legacy-python/` are not maintained for security fixes. Upgrade to the latest stable release before checking whether a problem still exists.
+Security fixes target the latest stable release in the 1.x series, starting with the initial release, 1.0.0. The historical Python implementation in `legacy-python/` is not maintained for security fixes. Upgrade to the latest stable release before checking whether a problem still exists.
 
 ## Reporting a vulnerability
 

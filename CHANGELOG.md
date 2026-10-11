@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.0 — 2026-10-11
+## 1.0.0 — 2026-10-11
 
 First GitHub release of the Node.js / Electron desktop application.
 
