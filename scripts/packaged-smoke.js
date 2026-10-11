@@ -1,0 +1,11 @@
+'use strict';
+const path = require('node:path');
+const { spawn } = require('node:child_process');
+const portable = process.argv.includes('--portable');
+const env = { ...process.env, UPDATEPILOT_QA_DIR: path.resolve(__dirname, '..', '.qa', portable ? 'portable' : 'packaged') };
+delete env.ELECTRON_RUN_AS_NODE;
+const exe = portable ? path.resolve(__dirname, '..', 'dist', 'UpdatePilot-3.0.0-x64.exe') : path.resolve(__dirname, '..', 'dist', 'win-unpacked', 'UpdatePilot.exe');
+const flags = process.argv.slice(2).filter(flag => flag !== '--portable');
+const child = spawn(exe, ['--qa','--smoke',...flags], { env, windowsHide:true, stdio:'inherit' });
+child.on('error', error => { console.error(error.message); process.exitCode = 1; });
+child.on('exit', code => { process.exitCode = code ?? 1; });

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UpdatePilot</title>
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><img src="../assets/icon.png" alt="" class="brand-mark"><div><strong>UpdatePilot</strong><span data-i18n="app_sub">Update centre</span></div></div>
+    <nav class="nav" data-i18n-aria="main_navigation" aria-label="Main navigation">
+      <button class="nav-item active" data-nav="dash"><span data-icon="grid"></span><span data-i18n="dash">Overview</span><b class="nav-badge" id="badge-update" hidden>0</b></button>
+      <button class="nav-item" data-nav="programs"><span data-icon="box"></span><span data-i18n="programs">Installed apps</span></button>
+      <button class="nav-item" data-nav="manual"><span data-icon="download"></span><span data-i18n="manual">Manual packages</span></button>
+      <button class="nav-item" data-nav="history"><span data-icon="history"></span><span data-i18n="history">Activity</span></button>
+    </nav>
+    <div class="sidebar-foot"><button class="nav-item" data-nav="settings"><span data-icon="settings"></span><span data-i18n="settings">Settings</span></button><span class="foot-ver">UpdatePilot 3.0</span></div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="topbar-main"><h1 id="page-title">Overview</h1><div class="chip" id="live-chip"><span class="dot"></span><span id="live-text">Ready</span></div></div><div class="topbar-actions"><button class="btn ghost" id="btn-scan" data-act="scan"><span data-icon="refresh"></span><span data-i18n="scan">Scan apps</span></button><button class="btn primary" id="btn-check" data-act="check"><span data-icon="bolt"></span><span data-i18n="check">Check for updates</span></button></div></header>
+    <div class="top-progress" id="top-progress" hidden><span></span></div>
+    <section class="page active" id="page-dash">
+      <div class="stat-grid">
+        <div class="stat-card"><span class="stat-icon" data-icon="box"></span><div><b class="stat-num" id="stat-total">—</b><span class="stat-label" data-i18n="installed">Installed</span></div></div>
+        <div class="stat-card"><span class="stat-icon" data-icon="check"></span><div><b class="stat-num" id="stat-ok">—</b><span class="stat-label" data-i18n="up_to_date">Current at source</span></div></div>
+        <div class="stat-card"><span class="stat-icon" data-icon="bolt"></span><div><b class="stat-num" id="stat-update">—</b><span class="stat-label" data-i18n="updates">Updates available</span></div></div>
+        <div class="stat-card"><span class="stat-icon" data-icon="download"></span><div><b class="stat-num" id="stat-manual">—</b><span class="stat-label" data-i18n="packages">Manual packages</span></div></div>
+      </div>
+      <div class="alert" id="update-banner" hidden><span data-icon="bolt"></span><span id="banner-text"></span></div>
+      <div class="card"><div class="card-head"><h2 data-i18n="history_updates">Updates</h2><span id="last-check-chip" class="muted"></span></div><div class="rich-list" id="dash-list"></div><div class="empty" id="dash-empty"><span class="empty-icon" data-icon="check"></span><h3 data-i18n="no_updates">No new updates found</h3><p data-i18n="no_updates_desc"></p><button class="btn" data-nav="programs" data-i18n="browse_apps">Browse installed apps</button></div></div>
+    </section>
+    <section class="page" id="page-programs">
+      <div class="toolbar"><label class="search"><span data-icon="search"></span><input id="search-input" type="search" data-i18n-placeholder="search" placeholder="Search apps or publishers…" autocomplete="off"></label><span id="prog-count" class="muted"></span><span class="grow"></span><button class="btn ghost" data-export="status"><span data-icon="download"></span><span data-i18n="export">Export CSV</span></button></div>
+      <div class="card table-card"><table class="tbl" id="tbl-programs"><thead><tr><th data-sort="name" data-i18n="name"></th><th data-sort="version" data-i18n="version"></th><th data-sort="publisher" data-i18n="publisher"></th><th data-sort="status" data-i18n="status"></th><th data-sort="latest" data-i18n="latest"></th><th data-sort="source" data-i18n="source"></th><th></th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section class="page" id="page-manual">
+      <div class="toolbar"><p class="muted" data-i18n="manual_desc"></p><span class="grow"></span><button class="btn ghost" data-act="open-download"><span data-icon="folder"></span><span data-i18n="open_downloads"></span></button><button class="btn primary" data-act="manual-add"><span data-icon="plus"></span><span data-i18n="add_package"></span></button></div>
+      <div class="card table-card"><table class="tbl" id="tbl-manual"><thead><tr><th data-i18n="name"></th><th data-i18n="version"></th><th data-i18n="status"></th><th data-i18n="latest"></th><th data-i18n="source"></th><th data-i18n="notes"></th><th></th></tr></thead><tbody></tbody></table><div class="empty" id="manual-empty"><span class="empty-icon" data-icon="box"></span><h3 data-i18n="manual_empty"></h3><p data-i18n="manual_desc"></p><button class="btn" data-act="manual-add" data-i18n="add_package"></button></div></div>
+    </section>
+    <section class="page" id="page-history">
+      <div class="toolbar"><div class="chip-group" id="hist-filters"><button class="chip-btn active" data-hf="all" data-i18n="all"></button><button class="chip-btn" data-hf="updates" data-i18n="history_updates"></button><button class="chip-btn" data-hf="scans" data-i18n="history_scans"></button><button class="chip-btn" data-hf="downloads" data-i18n="history_downloads"></button><button class="chip-btn" data-hf="other" data-i18n="history_other"></button></div><span class="grow"></span><button class="btn ghost" data-export="history"><span data-icon="download"></span><span data-i18n="export"></span></button><button class="btn ghost" data-act="clear-history"><span data-icon="trash"></span><span data-i18n="clear"></span></button></div>
+      <div class="card table-card"><table class="tbl" id="tbl-history"><thead><tr><th data-i18n="time"></th><th data-i18n="name"></th><th data-i18n="event"></th><th data-i18n="detail"></th></tr></thead><tbody></tbody></table><div class="empty" id="history-empty"><span class="empty-icon" data-icon="history"></span><h3 data-i18n="history_empty"></h3><p data-i18n="history_empty_desc"></p></div></div>
+    </section>
+  </main>
+  <div class="backdrop" id="backdrop" hidden></div><aside class="drawer" id="drawer" hidden data-i18n-aria="detail" aria-label="Application details"></aside>
+  <div class="modal-root" id="modal-root" hidden></div>
+  <div class="settings-overlay" id="settings-overlay" hidden><section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title" tabindex="-1">
+    <header class="settings-header"><div><h2 id="settings-title" data-i18n="settings">Settings</h2><p data-i18n="settings_sub">Application preferences · applies instantly</p></div><button class="btn icon" data-act="close-settings" data-i18n-title="close"><span data-icon="x"></span></button></header>
+    <div class="settings-layout"><nav class="settings-nav" data-i18n-aria="settings_sections" aria-label="Settings sections">
+      <button data-settings-tab="general" class="active"><span data-icon="sliders"></span><span data-i18n="general"></span></button><button data-settings-tab="appearance"><span data-icon="appearance"></span><span data-i18n="appearance"></span></button><button data-settings-tab="updates"><span data-icon="download"></span><span data-i18n="settings_updates"></span></button><button data-settings-tab="notifications"><span data-icon="bell"></span><span data-i18n="notifications"></span></button><button data-settings-tab="language"><span data-icon="globe"></span><span data-i18n="language"></span></button><button data-settings-tab="advanced"><span data-icon="settings"></span><span data-i18n="advanced"></span></button>
+    </nav><div class="settings-content" id="settings-content"></div></div>
+    <footer class="settings-footer"><span id="settings-status" data-i18n="autosaved">Settings are saved automatically</span><div><button class="btn ghost" data-act="reset-settings" data-i18n="reset"></button><button class="btn primary" data-act="close-settings" data-i18n="done"></button></div></footer>
+  </section></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script src="./i18n.js"></script><script src="./app.js"></script>
+</body>
+</html>

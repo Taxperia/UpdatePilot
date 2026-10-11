@@ -1,0 +1,32 @@
+{
+  "name": "updatepilot",
+  "version": "3.0.0",
+  "description": "Windows uygulamaları için otomatik güncelleme merkezi",
+  "main": "electron/main.js",
+  "private": true,
+  "author": "UpdatePilot",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "postinstall": "node -e \"require('electron')\"",
+    "start": "node scripts/launch.js",
+    "test": "node --test test/*.test.js",
+    "diagnose": "node scripts/diagnose.js",
+    "qa": "node scripts/launch.js --qa",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "overrides": { "sprintf-js": "1.1.4" },
+  "build": {
+    "appId": "com.updatepilot.desktop",
+    "productName": "UpdatePilot",
+    "directories": { "output": "dist" },
+    "files": ["electron/**/*", "src/**/*", "web/**/*", "assets/**/*", "package.json"],
+    "win": { "target":"portable", "signExecutable":false, "icon":"assets/icon.ico" },
+    "portable": { "artifactName": "UpdatePilot-${version}-${arch}.exe" }
+  }
+}
